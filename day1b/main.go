@@ -1,10 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	// "math"
 	"os"
 	"strconv"
-	"bufio"
 )
 
 /*
@@ -17,6 +18,10 @@ import (
 		on the way
 */
 
+func Hello() string {
+	return "Hello, world"
+}
+
 // wrapper of convenience
 func check(e error) {
 	if e != nil {
@@ -26,23 +31,37 @@ func check(e error) {
 
 // pass a pointer to the 'global' variable so it can be modified as an effect
 func getDialPosition(currentPosition int, input int, numZeroes *int) int {
-	result := currentPosition + input
-	/*
-	to hit 0 on the way, $result should be outside (0,99)
-
-	10 -12 = -2    result < 0
-	96 +5  = 101   result > 99
-	*/
-
-	if (currentPosition != 0 && (result > 99 || result < 0)){
-		*numZeroes++
-	}
-
-	if result > 0 {
-		return result % 100
+	if input > 0 {
+		for range input {
+			currentPosition++
+			if currentPosition == 100 {
+				// after 99 comes 0
+				currentPosition = 0
+				*numZeroes++
+			}
+		}
 	} else {
-		return (100 + result) % 100
+		input = -input
+		for range input {
+			currentPosition--
+			if currentPosition == 0 {
+				*numZeroes++
+			}
+			if currentPosition == -1 {
+				// after 0 comes 99
+				currentPosition = 99
+			}
+		}
 	}
+
+	return currentPosition
+
+	/*
+		to hit 0 on the way, $result should be outside (0,99)
+
+		10 -12 = -2    result < 0
+		96 +5  = 101   result > 99
+	*/
 }
 
 func getIntFromLine(line string) int {
@@ -92,7 +111,7 @@ func testFunctions() {
 	}
 
 	fmt.Printf("start\tmove\tstop\tcorrect\t0_hits\n")
-	for i := range turns{
+	for i := range turns {
 		// fmt.Println(turns[i])
 		motion := getIntFromLine(turns[i])
 
@@ -112,7 +131,21 @@ func testFunctions() {
 	fmt.Printf("%d\n", numZeroes)
 }
 
-func processInput(){
+func test1b() {
+	cases := [][2]int{
+		{5, 5},
+		{5, -5},
+		{5, -6},
+		{5, 95},
+		{5, 96},
+	}
+
+	for i := range cases {
+		fmt.Printf("%d %d\n", cases[i][0], cases[i][1])
+	}
+}
+
+func processInput() {
 	initialDialPosition := 50
 	currentDialPosition := initialDialPosition
 
@@ -131,9 +164,9 @@ func processInput(){
 
 		currentDialPosition = getDialPosition(currentDialPosition, getIntFromLine(line), &numZeroes)
 		// fmt.Println(currentDialPosition)
-		if currentDialPosition == 0 {
-			numZeroes++
-		}
+		// if currentDialPosition == 0 {
+		// 	numZeroes++
+		// }
 	}
 
 	// Check for errors during scanning
@@ -146,9 +179,9 @@ func main() {
 	//somehow need this for neovim to show stdout correctly
 	fmt.Println()
 
-	testFunctions()
+	// testFunctions()
 
-	// processInput()
+	processInput()
 }
 
 /*
